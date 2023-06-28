@@ -2,7 +2,7 @@ from analis.models import SitioWeb, Publicacion
 
 import feedparser
 
-def ultimas_publicaciones():
+def ultimas_publicaciones(numberPostGet):
 
     sitios_web = SitioWeb.objects.all()
 
@@ -11,7 +11,7 @@ def ultimas_publicaciones():
         # Descargar y analizar el feed
         feed_url = feedparser.parse(feed_url)
         # Obtener los últimos 10 posts
-        posts = feed_url.entries[:10]
+        posts = feed_url.entries[:numberPostGet]
 
         for post in posts:
             titulo = post.title
