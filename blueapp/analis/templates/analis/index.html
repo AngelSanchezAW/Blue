@@ -6,6 +6,23 @@
     <title>Blue - Tendencias en Tecnología</title>
 </head>
 <body>
+    <form action="{% url 'index' %}" method="GET">
+        <label for="fecha_inicio">Fecha de inicio:</label>
+        <input type="date" id="fecha_inicio" name="fecha_inicio">
+    
+        <label for="fecha_fin">Fecha de fin:</label>
+        <input type="date" id="fecha_fin" name="fecha_fin">
+    
+        <input type="submit" value="Enviar">
+    </form>    
+    <h1>Publicaciones</h1>
+    <ul>
+        {% for publicacion in publicaciones %}
+        <li><a href="{{ publicacion.url }}">{{ publicacion.titulo }}</a></li>
+        <li>By <a href="{{ publicacion.sitio_web.url }}">{{ publicacion.sitio_web.nombre }}</a> - {{ publicacion.fecha_creacion }}</li>
+        <br>
+        {% endfor %}
+    </ul>    
     <form action="/get-post/" method="GET">
         <input type="text" name="numberPostGet" placeholder="Ingresa el parámetro">
         <button type="submit">Enviar</button>

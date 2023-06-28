@@ -1,10 +1,11 @@
 from analis.models import SitioWeb, Publicacion
-
+from datetime import datetime
 import feedparser
 
 def ultimas_publicaciones(numberPostGet):
 
     sitios_web = SitioWeb.objects.all()
+    fecha_actual = datetime.now()
 
     for sitio_web in sitios_web:
         feed_url = sitio_web.feed_url
@@ -25,6 +26,7 @@ def ultimas_publicaciones(numberPostGet):
                     sitio_web=sitio_web,  # Aquí asignamos el objeto sitio_web
                     titulo=titulo,
                     url=url,
+                    fecha_creacion = fecha_actual
                 )
 
                 # Guardar la publicación en la base de datos

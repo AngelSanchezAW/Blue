@@ -13,6 +13,7 @@ class Publicacion(models.Model):
     url = models.CharField(max_length=255)
     imagen_portada = models.CharField(max_length=255)
     extracto = models.CharField(max_length=250)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
 
 class Engagement(models.Model):
     engagement_id = models.IntegerField(primary_key=True)
