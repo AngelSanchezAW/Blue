@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import JsonResponse
 
@@ -36,3 +36,16 @@ def borrar_sitio_web(request, sitio_web_id):
         return JsonResponse({'mensaje': 'Sitio web eliminado correctamente.'})
     except SitioWeb.DoesNotExist:
         return JsonResponse({'error': 'Sitio web no encontrado.'}, status=404)
+
+def agregar_sitio_web(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('sitioNombre')
+        url = request.POST.get('sitioUrl')
+        feed_url = request.POST.get('sitioRSS')
+
+        # Guardar el sitio web en la base de datos
+        sitio_web = SitioWeb(nombre=nombre, url=url, feed_url=feed_url)
+        sitio_web.save()
+
+        return redirect('index')  # Cambiar 'nombre_de_tu_vista' al nombre de la vista donde deseas redirigir después de guardar
+    return render(request, 'analis/index.htmll')

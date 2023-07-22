@@ -26,7 +26,7 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#sitiosModal">Listar</a></li>
-                      <li><a class="dropdown-item" href="#">Agregar</a></li>
+                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSitioModal">Agregar</a></li>
                       <li><a class="dropdown-item" href="#">Actualizar</a></li>
                     </ul>
                   </li>
@@ -61,7 +61,7 @@
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="sitiosModalLabel">Modal title</h5>
+            <h5 class="modal-title" id="sitiosModalLabel">Sitios Web</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -86,9 +86,32 @@
                     {% endfor %}
                 </ol> 
             </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+        </div>
+    </div>
+     <!-- Agregar Sitio Web-->
+     <div class="modal fade modal-dialog-scrollable" id="addSitioModal" tabindex="-1" aria-labelledby="addSitioModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSitioModalLabel">Agregar nuevo Sitio Web</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'agregar_sitio_web' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="sitioNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="sitioNombre" name="sitioNombre">
+                        <br> 
+                        <label for="sitioUrl" class="form-label">URL</label>
+                        <input type="text" class="form-control" id="sitioUrl" name="sitioUrl">
+                        <br>
+                        <label for="sitioRSS" class="form-label">URL RSS</label>
+                        <input type="text" class="form-control" id="sitioRSS" name="sitioRSS">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </form>
             </div>
         </div>
         </div>
