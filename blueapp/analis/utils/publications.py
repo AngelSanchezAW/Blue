@@ -11,7 +11,7 @@ def ultimas_publicaciones(numberPostGet):
         feed_url = sitio_web.feed_url
         # Descargar y analizar el feed
         feed_url = feedparser.parse(feed_url)
-        # Obtener los últimos 10 posts
+        # Obtener los últimos n posts
         posts = feed_url.entries[:numberPostGet]
 
         for post in posts:
