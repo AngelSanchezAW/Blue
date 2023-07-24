@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#sitiosModal">Listar</a></li>
                       <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSitioModal">Agregar</a></li>
-                      <li><a class="dropdown-item" href="#">Actualizar</a></li>
+                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#actualizarSitioModal">Actualizar</a></li>
                     </ul>
                   </li>
                   <li class="nav-item">
@@ -116,43 +116,94 @@
         </div>
         </div>
     </div>
+    <!-- Actualizar Sitio Web-->
+    <div class="modal fade modal-dialog-scrollable" id="actualizarSitioModal" tabindex="-1" aria-labelledby="actualizarSitioModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actualizarSitioModalLabel">Actualizar Sitio Web</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="" id="actualizarSitioForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="sitiosDataList" class="form-label">Eelegir Sitio Web</label>
+                        <input class="form-control" list="datalistOptions" id="sitiosDataList" placeholder="Eelegir sitio..">
+                        <datalist id="datalistOptions">
+                          {% for sitio in sitios_web %}
+                          <option value="{{ sitio.nombre }}" data-id="{{ sitio.sitio_web_id }}" data-url="{{ sitio.url }}" data-rss="{{ sitio.feed_url }}">
+                          {% endfor %}  
+                        </datalist>
+                        <label for="actualizarSitioNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="actualizarSitioNombre" name="actualizarSitioNombre">
+                        <br> 
+                        <label for="actualizarSitioUrl" class="form-label">URL</label>
+                        <input type="text" class="form-control" id="actualizarSitioUrl" name="actualizarSitioUrl">
+                        <br>
+                        <label for="actualizarSitioRSS" class="form-label">URL RSS</label>
+                        <input type="text" class="form-control" id="actualizarSitioRSS" name="actualizarSitioRSS">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>        
     <!-- Borrar sitio web-->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          const deleteButtons = document.querySelectorAll(".borrar-sitio-btn");
-      
-          deleteButtons.forEach((button) => {
-            button.addEventListener("click", function() {
-              const sitioWebId = this.dataset.sitioWebId;
-              if (confirm("¿Estás seguro de que deseas eliminar este sitio web?")) {
-                fetch(`/borrar_sitio_web/${sitioWebId}/`, {
-                  method: "POST",
-                  headers: {
-                    "X-CSRFToken": getCookie("csrftoken"),
-                  },
+      document.addEventListener("DOMContentLoaded", function() {
+        const deleteButtons = document.querySelectorAll(".borrar-sitio-btn");
+    
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", function() {
+            const sitioWebId = this.dataset.sitioWebId;
+            if (confirm("¿Estás seguro de que deseas eliminar este sitio web?")) {
+              fetch(`/borrar_sitio_web/${sitioWebId}/`, {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": getCookie("csrftoken"),
+                },
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if ("mensaje" in data) {
+                      const sitioWebElement = document.getElementById(`sitio-web-${sitioWebId}`);
+                      sitioWebElement.parentNode.removeChild(sitioWebElement);
+                  }
                 })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    if ("mensaje" in data) {
-                        const sitioWebElement = document.getElementById(`sitio-web-${sitioWebId}`);
-                        sitioWebElement.parentNode.removeChild(sitioWebElement);
-                    }
-                  })
-                  .catch((error) => {
-                    console.error("Error:", error);
-                  });
-              }
-            });
+                .catch((error) => {
+                  console.error("Error:", error);
+                });
+            }
           });
-      
-          function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(";").shift();
-          }
         });
+        function getCookie(name) {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) return parts.pop().split(";").shift();
+        }
+      });
+      // Función para llenar los campos cuando se selecciona un sitio web
+      function llenarCampos() {
+        const sitioSeleccionado = document.getElementById('sitiosDataList').value;
+        const sitiosOptions = document.getElementById('datalistOptions').getElementsByTagName('option');
+
+        for (const option of sitiosOptions) {
+            if (option.value === sitioSeleccionado) {
+                document.getElementById('actualizarSitioNombre').value = option.value;
+                document.getElementById('actualizarSitioUrl').value = option.getAttribute('data-url');
+                document.getElementById('actualizarSitioRSS').value = option.getAttribute('data-rss');
+                const sitioSeleccionadoId = option.getAttribute('data-id');
+                actualizarSitioForm.action = '/actualizar_sitio_web/' + sitioSeleccionadoId + '/';
+                break;
+            } 
+        }
+      }
+      // Asociar la función al evento onchange del input de la lista desplegable
+      document.getElementById('sitiosDataList').onchange = llenarCampos;
     </script>      
 </body>
 </html>

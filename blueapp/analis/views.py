@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.http import JsonResponse
 
@@ -26,7 +26,7 @@ def index(request):
 def getPost(request):
     numberPostGet = int(request.GET.get('numberPostGet'))
     ultimas_publicaciones(numberPostGet)
-    return HttpResponse("Parámetro enviado y función ejecutada")
+    return redirect('index')
 
 
 def borrar_sitio_web(request, sitio_web_id):
@@ -48,4 +48,20 @@ def agregar_sitio_web(request):
         sitio_web.save()
 
         return redirect('index')  # Cambiar 'nombre_de_tu_vista' al nombre de la vista donde deseas redirigir después de guardar
+    return render(request, 'analis/index.htmll')
+
+def actualizar_sitio_web(request, sitio_web_id):
+    sitio_web = get_object_or_404(SitioWeb, pk=sitio_web_id)
+
+    if request.method == 'POST':
+        nombre = request.POST.get('actualizarSitioNombre')
+        url = request.POST.get('actualizarSitioUrl')
+        rss = request.POST.get('actualizarSitioRSS')
+
+        sitio_web.nombre = nombre
+        sitio_web.url = url
+        sitio_web.feed_url = rss
+        sitio_web.save()
+
+        return redirect('index')
     return render(request, 'analis/index.htmll')
