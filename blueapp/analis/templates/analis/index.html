@@ -81,7 +81,9 @@
                                     {% endif %}
                                 {% endfor %} 
                             </div>
-                            <span class="borrar-sitio-btn badge bg-danger rounded-pill">Borrar</span>                  
+                            {% if user.is_superuser %}
+                            <span class="borrar-sitio-btn badge bg-danger rounded-pill">Borrar</span>
+                            {% endif %}                  
                         </li>
                     {% endfor %}
                 </ol> 
@@ -98,20 +100,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'agregar_sitio_web' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="sitioNombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="sitioNombre" name="sitioNombre">
-                        <br> 
-                        <label for="sitioUrl" class="form-label">URL</label>
-                        <input type="text" class="form-control" id="sitioUrl" name="sitioUrl">
-                        <br>
-                        <label for="sitioRSS" class="form-label">URL RSS</label>
-                        <input type="text" class="form-control" id="sitioRSS" name="sitioRSS">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
-                </form>
+                {% if user.is_superuser %}
+                  <form method="post" action="{% url 'agregar_sitio_web' %}">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="sitioNombre" class="form-label">Nombre</label>
+                          <input type="text" class="form-control" id="sitioNombre" name="sitioNombre">
+                          <br> 
+                          <label for="sitioUrl" class="form-label">URL</label>
+                          <input type="text" class="form-control" id="sitioUrl" name="sitioUrl">
+                          <br>
+                          <label for="sitioRSS" class="form-label">URL RSS</label>
+                          <input type="text" class="form-control" id="sitioRSS" name="sitioRSS">
+                      </div>
+                      <button type="submit" class="btn btn-primary">Agregar</button>
+                  </form>
+                {% else %}
+                  <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas agregar sitios web nuevos a Blue.</p>
+                {% endif %}
             </div>
         </div>
         </div>
@@ -125,27 +131,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" action="" id="actualizarSitioForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="sitiosDataList" class="form-label">Eelegir Sitio Web</label>
-                        <input class="form-control" list="datalistOptions" id="sitiosDataList" placeholder="Eelegir sitio..">
-                        <datalist id="datalistOptions">
-                          {% for sitio in sitios_web %}
-                          <option value="{{ sitio.nombre }}" data-id="{{ sitio.sitio_web_id }}" data-url="{{ sitio.url }}" data-rss="{{ sitio.feed_url }}">
-                          {% endfor %}  
-                        </datalist>
-                        <label for="actualizarSitioNombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="actualizarSitioNombre" name="actualizarSitioNombre">
-                        <br> 
-                        <label for="actualizarSitioUrl" class="form-label">URL</label>
-                        <input type="text" class="form-control" id="actualizarSitioUrl" name="actualizarSitioUrl">
-                        <br>
-                        <label for="actualizarSitioRSS" class="form-label">URL RSS</label>
-                        <input type="text" class="form-control" id="actualizarSitioRSS" name="actualizarSitioRSS">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
-                </form>
+                {% if user.is_superuser %}
+                  <form method="post" action="" id="actualizarSitioForm">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="sitiosDataList" class="form-label">Eelegir Sitio Web</label>
+                          <input class="form-control" list="datalistOptions" id="sitiosDataList" placeholder="Eelegir sitio..">
+                          <datalist id="datalistOptions">
+                            {% for sitio in sitios_web %}
+                            <option value="{{ sitio.nombre }}" data-id="{{ sitio.sitio_web_id }}" data-url="{{ sitio.url }}" data-rss="{{ sitio.feed_url }}">
+                            {% endfor %}  
+                          </datalist>
+                          <label for="actualizarSitioNombre" class="form-label">Nombre</label>
+                          <input type="text" class="form-control" id="actualizarSitioNombre" name="actualizarSitioNombre">
+                          <br> 
+                          <label for="actualizarSitioUrl" class="form-label">URL</label>
+                          <input type="text" class="form-control" id="actualizarSitioUrl" name="actualizarSitioUrl">
+                          <br>
+                          <label for="actualizarSitioRSS" class="form-label">URL RSS</label>
+                          <input type="text" class="form-control" id="actualizarSitioRSS" name="actualizarSitioRSS">
+                      </div>
+                      <button type="submit" class="btn btn-primary">Agregar</button>
+                  </form>
+                {% else %}
+                  <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
+                {% endif %}
             </div>
         </div>
       </div>

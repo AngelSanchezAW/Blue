@@ -6,6 +6,8 @@ from .models import SitioWeb, Publicacion
 
 from .utils.publications import ultimas_publicaciones
 
+from django.contrib.auth.decorators import user_passes_test
+
 def index(request):
     sitios_web = SitioWeb.objects.all()
     publicaciones = Publicacion.objects.all()
@@ -28,7 +30,8 @@ def getPost(request):
     ultimas_publicaciones(numberPostGet)
     return redirect('index')
 
-
+# Vista para borrar, solo accesible para administradores
+@user_passes_test(lambda u: u.is_superuser)
 def borrar_sitio_web(request, sitio_web_id):
     try:
         sitio_web = SitioWeb.objects.get(pk=sitio_web_id)
@@ -37,6 +40,8 @@ def borrar_sitio_web(request, sitio_web_id):
     except SitioWeb.DoesNotExist:
         return JsonResponse({'error': 'Sitio web no encontrado.'}, status=404)
 
+# Vista para agregar, solo accesible para administradores
+@user_passes_test(lambda u: u.is_superuser)
 def agregar_sitio_web(request):
     if request.method == 'POST':
         nombre = request.POST.get('sitioNombre')
@@ -50,6 +55,8 @@ def agregar_sitio_web(request):
         return redirect('index')  # Cambiar 'nombre_de_tu_vista' al nombre de la vista donde deseas redirigir después de guardar
     return render(request, 'analis/index.htmll')
 
+# Vista para actualizar, solo accesible para administradores
+@user_passes_test(lambda u: u.is_superuser)
 def actualizar_sitio_web(request, sitio_web_id):
     sitio_web = get_object_or_404(SitioWeb, pk=sitio_web_id)
 
