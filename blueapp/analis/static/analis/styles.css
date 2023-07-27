@@ -1,0 +1,5 @@
+span.borrar-sitio-btn.badge.bg-danger.rounded-pill{
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+}
