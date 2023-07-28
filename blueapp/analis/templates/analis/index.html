@@ -32,7 +32,7 @@
                     </ul>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="#">Sitios</a>
+                    <a class="nav-link dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#getPostModal">Sitios</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Pricing</a>
@@ -66,10 +66,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ol class="list-group list-group-numbered">
+                <ol id="siteList" class="list-group list-group-numbered">
                     <p>Total de Sitios Web: {{ sitios_web.count }}</p>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar sitio web...">
+                    <br>
                     {% for sitio in sitios_web %}
-                        <li id="sitio-web-{{ sitio.sitio_web_id }}" class="list-group-item d-flex justify-content-between align-items-start">
+                        <li id="sitio-web-{{ sitio.sitio_web_id }}" class="list-group-item d-flex justify-content-between align-items-start sitio-item">
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold"><a href="{{ sitio.url }}">{{ sitio.nombre }}</a></div>
                                 <b>Nombre: </b>{{ sitio.nombre }} <br>  
@@ -87,6 +89,26 @@
                             {% endif %}                  
                         </li>
                     {% endfor %}
+                    <script>
+                      document.addEventListener("DOMContentLoaded", function() {
+                          var searchInput = document.getElementById("searchInput");
+                          searchInput.addEventListener("keyup", function() {
+                              var value = this.value.toLowerCase();
+                              var sitioItems = document.getElementsByClassName("sitio-item");
+              
+                              for (var i = 0; i < sitioItems.length; i++) {
+                                  var sitioItem = sitioItems[i];
+                                  var sitioName = sitioItem.querySelectorAll(".fw-bold")[0].textContent.toLowerCase();
+                                  
+                                  if (sitioName.includes(value)) {
+                                      sitioItem.style.cssText = "display: flex !important";
+                                  } else {
+                                    sitioItem.style.cssText = "display: none !important";
+                                  }
+                              }
+                          });
+                      });
+                    </script>
                 </ol> 
             </div>
         </div>
@@ -154,6 +176,77 @@
                       </div>
                       <button type="submit" class="btn btn-primary">Agregar</button>
                   </form>
+                {% else %}
+                  <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- Obtener Post-->
+    <div class="modal fade modal-dialog-scrollable" id="getPostModal" tabindex="-1" aria-labelledby="getPostModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="getPostModalLabel">Actualizar Sitio Web</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.is_superuser %}
+                <form method="get" action="">
+                  <label for="numberPostGet">Número de publicaciones a traer:</label>
+                  <input type="number" name="numberPostGet" id="numberPostGet" min="1" required>
+                  <br>
+                  <label for="sitiosWeb">Sitios web:</label>
+                  <div>
+                      <input type="checkbox" name="todosSitios" id="todosSitios">
+                      <label for="todosSitios">Todos los sitios web</label>
+                  </div>
+                  {% for sitio in sitios_web %}
+                      <div>
+                          <input type="checkbox" name="sitiosWeb" value="{{ sitio.id }}" id="sitio_{{ sitio.id }}">
+                          <label for="sitio_{{ sitio.id }}">{{ sitio.nombre }}</label>
+                      </div>
+                  {% endfor %}
+                  <br>
+                  <label for="todasPublicaciones">Traer todas las publicaciones</label>
+                  <input type="checkbox" name="todasPublicaciones" id="todasPublicaciones">
+                  <br>
+                  <button type="submit">Traer publicaciones</button>
+              </form>
+              
+              <script>
+                  const numberPostGetInput = document.getElementById('numberPostGet');
+                  const todasPublicacionesInput = document.getElementById('todasPublicaciones');
+                  const todosSitiosInput = document.getElementById('todosSitios');
+                  const sitiosWebCheckboxes = document.querySelectorAll('[name="sitiosWeb"]');
+              
+                  // Función para deshabilitar o habilitar el campo numberPostGet según el estado de todasPublicaciones
+                  function toggleNumberPostGet() {
+                      numberPostGetInput.disabled = todasPublicacionesInput.checked;
+                  }
+              
+                  // Función para deshabilitar o habilitar los checkboxes de sitiosWeb según el estado de todosSitios
+                  function toggleSitiosWebCheckboxes() {
+                      for (const checkbox of sitiosWebCheckboxes) {
+                          checkbox.disabled = todosSitiosInput.checked;
+                      }
+                  }
+              
+                  // Agregar event listeners a todasPublicacionesInput y todosSitiosInput
+                  todasPublicacionesInput.addEventListener('change', function () {
+                      toggleNumberPostGet();
+                  });
+              
+                  todosSitiosInput.addEventListener('change', function () {
+                      toggleSitiosWebCheckboxes();
+                  });
+              
+                  // Llamar a las funciones para configurar el estado inicial del formulario
+                  toggleNumberPostGet();
+                  toggleSitiosWebCheckboxes();
+              </script>
+              
                 {% else %}
                   <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
                 {% endif %}
