@@ -32,7 +32,7 @@
                     </ul>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#getPostModal">Sitios</a>
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#getPostModal">Publicaciones</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="#">Pricing</a>
@@ -136,7 +136,7 @@
                           <label for="sitioRSS" class="form-label">URL RSS</label>
                           <input type="text" class="form-control" id="sitioRSS" name="sitioRSS">
                       </div>
-                      <button type="submit" class="btn btn-primary">Agregar</button>
+                      <button type="submit" class="btn btn-primary" style="float: right;">Agregar</button>
                   </form>
                 {% else %}
                   <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas agregar sitios web nuevos a Blue.</p>
@@ -174,7 +174,7 @@
                           <label for="actualizarSitioRSS" class="form-label">URL RSS</label>
                           <input type="text" class="form-control" id="actualizarSitioRSS" name="actualizarSitioRSS">
                       </div>
-                      <button type="submit" class="btn btn-primary">Agregar</button>
+                      <button type="submit" class="btn btn-primary" style="float: right;">Actualizar</button>
                   </form>
                 {% else %}
                   <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
@@ -188,31 +188,33 @@
       <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="getPostModalLabel">Actualizar Sitio Web</h5>
+                <h5 class="modal-title" id="getPostModalLabel">Optener publicaciones de Sitios Web</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 {% if user.is_superuser %}
                 <form method="get" action="">
-                  <label for="numberPostGet">Número de publicaciones a traer:</label>
-                  <input type="number" name="numberPostGet" id="numberPostGet" min="1" required>
-                  <br>
-                  <label for="sitiosWeb">Sitios web:</label>
-                  <div>
-                      <input type="checkbox" name="todosSitios" id="todosSitios">
-                      <label for="todosSitios">Todos los sitios web</label>
+                  <p><b>¿De que sitios web deseas traer información?</b></p>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="todosSitios" id="todosSitios" checked>
+                    <label for="todosSitios">Todos los sitios web</label>
                   </div>
-                  {% for sitio in sitios_web %}
-                      <div>
-                          <input type="checkbox" name="sitiosWeb" value="{{ sitio.id }}" id="sitio_{{ sitio.id }}">
-                          <label for="sitio_{{ sitio.id }}">{{ sitio.nombre }}</label>
-                      </div>
-                  {% endfor %}
+                  <label for="sitiosWeb">De sitios web en espesifico:</label>
+                  <select class="form-select" multiple aria-label="multiple select">
+                    {% for sitio in sitios_web %}
+                      <option value="{{ sitio.id }}" name="sitiosWeb" id="sitio_{{ sitio.id }}">{{ sitio.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                  <hr>
+                  <p><b>¿Cúantas publicaciones por sitio deseas traer?</b></p>
+                  <input class="form-check-input" type="checkbox" name="todasPublicaciones" id="todasPublicaciones" checked>
+                  <label for="todasPublicaciones"> Todas las disponibles</label>
                   <br>
-                  <label for="todasPublicaciones">Traer todas las publicaciones</label>
-                  <input type="checkbox" name="todasPublicaciones" id="todasPublicaciones">
-                  <br>
-                  <button type="submit">Traer publicaciones</button>
+                  <label for="numberPostGet">Número de publicaciones a traer:</label>
+                  <input class="form-control" type="number" name="numberPostGet" id="numberPostGet" min="1" required>
+                  <i class="fw-lighter"style="font-size: .7rem;">Puedes elegir el numero de publicaciones a traer, pero siempre estarás limitado a el numero máximo de publicaciones disponibles en el FEED de cada sitio web.</i>
+                  <br><br>
+                  <button type="submit" class="btn btn-primary" style="float: right;">Optener publicaciones</button>
               </form>
               
               <script>
