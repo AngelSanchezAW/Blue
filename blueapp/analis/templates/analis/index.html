@@ -39,7 +39,13 @@
                   </li>
                 </ul>
                 <span class="navbar-text">
-                  Navbar text with an inline element
+                  {% if user.is_authenticated %}
+                    {% if user.first_name and user.last_name %}
+                        <p>Bienvenido, {{ user.first_name }} {{ user.last_name }} </p>
+                    {% else %}
+                        <p>Bienvenido</p>
+                    {% endif %}
+                  {% endif %}
                 </span>
               </div>
             </div>
@@ -85,7 +91,7 @@
                                 {% endfor %} 
                             </div>
                             {% if user.is_superuser %}
-                            <span class="borrar-sitio-btn badge bg-danger rounded-pill">Borrar</span>
+                            <span id="boton-borrar-sitio-web-{{ sitio.sitio_web_id }}" class="borrar-sitio-btn badge bg-danger rounded-pill">Borrar</span>
                             {% endif %}                  
                         </li>
                     {% endfor %}
@@ -265,7 +271,8 @@
     
         deleteButtons.forEach((button) => {
           button.addEventListener("click", function() {
-            const sitioWebId = this.dataset.sitioWebId;
+            const sitioWebId = this.id.split("-")[4];
+            console.log(sitioWebId)
             if (confirm("¿Estás seguro de que deseas eliminar este sitio web?")) {
               fetch(`/borrar_sitio_web/${sitioWebId}/`, {
                 method: "POST",

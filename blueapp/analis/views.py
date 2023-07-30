@@ -8,6 +8,7 @@ from .utils.publications import ultimas_publicaciones
 
 from django.contrib.auth.decorators import user_passes_test
 
+# Vista página de inicio (Index) 
 def index(request):
     sitios_web = SitioWeb.objects.all()
     publicaciones = Publicacion.objects.all()
