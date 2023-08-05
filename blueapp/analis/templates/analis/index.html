@@ -171,6 +171,7 @@
                             <option value="{{ sitio.nombre }}" data-id="{{ sitio.sitio_web_id }}" data-url="{{ sitio.url }}" data-rss="{{ sitio.feed_url }}">
                             {% endfor %}  
                           </datalist>
+                          <br>
                           <label for="actualizarSitioNombre" class="form-label">Nombre</label>
                           <input type="text" class="form-control" id="actualizarSitioNombre" name="actualizarSitioNombre">
                           <br> 
@@ -199,16 +200,17 @@
             </div>
             <div class="modal-body">
                 {% if user.is_superuser %}
-                <form method="get" action="">
+                <form method="POST" action="{% url 'get-post' %}">
+                  {% csrf_token %}
                   <p><b>¿De que sitios web deseas traer información?</b></p>
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="todosSitios" id="todosSitios" checked>
                     <label for="todosSitios">Todos los sitios web</label>
                   </div>
                   <label for="sitiosWeb">De sitios web en espesifico:</label>
-                  <select class="form-select" multiple aria-label="multiple select">
+                  <select class="form-select" multiple aria-label="multiple select" name="sitiosWeb">
                     {% for sitio in sitios_web %}
-                      <option value="{{ sitio.id }}" name="sitiosWeb" id="sitio_{{ sitio.id }}">{{ sitio.nombre }}</option>
+                      <option value="{{ sitio.sitio_web_id }}" id="sitio_{{ sitio.sitio_web_id }}">{{ sitio.nombre }}</option>
                     {% endfor %}
                   </select>
                   <hr>
@@ -217,12 +219,11 @@
                   <label for="todasPublicaciones"> Todas las disponibles</label>
                   <br>
                   <label for="numberPostGet">Número de publicaciones a traer:</label>
-                  <input class="form-control" type="number" name="numberPostGet" id="numberPostGet" min="1" required>
+                  <input class="form-control" type="number" name="numberPostGet" id="numberPostGet" min="1">
                   <i class="fw-lighter"style="font-size: .7rem;">Puedes elegir el numero de publicaciones a traer, pero siempre estarás limitado a el numero máximo de publicaciones disponibles en el FEED de cada sitio web.</i>
                   <br><br>
                   <button type="submit" class="btn btn-primary" style="float: right;">Optener publicaciones</button>
-              </form>
-              
+              </form>   
               <script>
                   const numberPostGetInput = document.getElementById('numberPostGet');
                   const todasPublicacionesInput = document.getElementById('todasPublicaciones');
@@ -283,8 +284,8 @@
                 .then((response) => response.json())
                 .then((data) => {
                   if ("mensaje" in data) {
-                      const sitioWebElement = document.getElementById(`sitio-web-${sitioWebId}`);
-                      sitioWebElement.parentNode.removeChild(sitioWebElement);
+                    const sitioWebElement = document.getElementById(`sitio-web-${sitioWebId}`);
+                    sitioWebElement.parentNode.removeChild(sitioWebElement);
                   }
                 })
                 .catch((error) => {

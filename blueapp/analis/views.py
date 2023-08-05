@@ -26,10 +26,19 @@ def index(request):
     }
     return render(request, 'analis/index.html', context)
 
+# Vista para obtener nuevas publicaciones, solo accesible para administradores
+@user_passes_test(lambda u: u.is_superuser)
 def getPost(request):
-    numberPostGet = int(request.GET.get('numberPostGet'))
-    ultimas_publicaciones(numberPostGet)
-    return redirect('index')
+    if request.method == 'POST':
+        todos_sitios = request.POST.get('todosSitios') == 'on'
+        sitios_web_seleccionados = request.POST.getlist('sitiosWeb')
+        sitios_web_seleccionados_int = [int(id_str) for id_str in sitios_web_seleccionados if id_str.isdigit()]
+        todas_publicaciones = request.POST.get('todasPublicaciones') == 'on'
+        number_post_str = request.POST.get('numberPostGet')
+        number_post = int(number_post_str) if number_post_str and number_post_str.isdigit() else None
+
+        ultimas_publicaciones(todos_sitios, sitios_web_seleccionados_int, todas_publicaciones, number_post)
+    return redirect('/')
 
 # Vista para borrar, solo accesible para administradores
 @user_passes_test(lambda u: u.is_superuser)
@@ -54,7 +63,7 @@ def agregar_sitio_web(request):
         sitio_web.save()
 
         return redirect('index')  # Cambiar 'nombre_de_tu_vista' al nombre de la vista donde deseas redirigir después de guardar
-    return render(request, 'analis/index.htmll')
+    return render(request, 'analis/index.html')
 
 # Vista para actualizar, solo accesible para administradores
 @user_passes_test(lambda u: u.is_superuser)
