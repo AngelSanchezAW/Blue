@@ -1,5 +1,14 @@
+*{
+    font-family: 'Figtree', sans-serif;
+}
+
 span.borrar-sitio-btn.badge.bg-danger.rounded-pill{
     cursor: pointer;
     position: absolute;
     right: 10px;
+}
+
+p.infoPost {
+    font-size: .8rem;
+    color: #a4a4a4;
 }

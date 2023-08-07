@@ -1,28 +1,61 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from django.http import JsonResponse
-
-from .models import SitioWeb, Publicacion
-
+from .models import SitioWeb, Publicacion, Engagement
+from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
-
 from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
 
 # Vista página de inicio (Index) 
 def index(request):
     sitios_web = SitioWeb.objects.all()
-    publicaciones = Publicacion.objects.all()
-    
+    publicaciones = Publicacion.objects.all().order_by('-engagement__total_engagement')
+    engagement = Engagement.objects.all()
+
+    paginator = Paginator(publicaciones, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)  
+    # Calcular la diferencia para cada página
+    page_range = page_obj.paginator.page_range
+    if page_obj.paginator.num_pages > 5:
+        if page_obj.number <= 3:
+            page_range = range(1, 7)
+        elif page_obj.number >= page_obj.paginator.num_pages - 3:
+            page_range = range(page_obj.paginator.num_pages - 4, page_obj.paginator.num_pages + 1)
+        else:
+            page_range = range(page_obj.number - 3, page_obj.number + 3)
+        
+    offset = (page_obj.number - 1) * paginator.per_page  # Calcular el desplazamiento
     num_publicaciones_por_sitio = {}
     for sitio_web in sitios_web:
         publicaciones_sitio = Publicacion.objects.filter(sitio_web=sitio_web)
         num_publicaciones = publicaciones_sitio.count()
         num_publicaciones_por_sitio[sitio_web] = num_publicaciones
 
+    sitios_con_engagement = SitioWeb.objects.annotate(total_engagement=Sum('publicacion__engagement__total_engagement')) 
+    # Ordena la lista de sitios por total de engagement de mayor a menor
+    sitios_con_engagement = sorted(sitios_con_engagement, key=lambda sitio: sitio.total_engagement or 0, reverse=True)
+
+    # Reemplaza los valores None por cero en la lista de sitios
+    for sitio in sitios_con_engagement:
+        if sitio.total_engagement is None:
+            sitio.total_engagement = 0
+            
+    etiquetas = [sitio.nombre for sitio in sitios_con_engagement]
+    totales_engagement = [sitio.total_engagement for sitio in sitios_con_engagement]
+       
+
     context = {
         'sitios_web': sitios_web,
         'publicaciones': publicaciones,
         'num_publicaciones_por_sitio': num_publicaciones_por_sitio,
+        'engagement': engagement,
+        'page_obj': page_obj,
+        'page_range': page_range,
+        'offset': offset,
+        'sitios_con_engagement': sitios_con_engagement,
+        'etiquetas': etiquetas, 
+        'totales_engagement': totales_engagement
     }
     return render(request, 'analis/index.html', context)
 
