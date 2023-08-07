@@ -5,6 +5,7 @@ from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
+import random
 
 # Vista página de inicio (Index) 
 def index(request):
@@ -40,10 +41,12 @@ def index(request):
     for sitio in sitios_con_engagement:
         if sitio.total_engagement is None:
             sitio.total_engagement = 0
-            
+
     etiquetas = [sitio.nombre for sitio in sitios_con_engagement]
     totales_engagement = [sitio.total_engagement for sitio in sitios_con_engagement]
-       
+
+    # Genera colores aleatorios en formato hexadecimal
+    colores_aleatorios = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in sitios_con_engagement]   
 
     context = {
         'sitios_web': sitios_web,
@@ -55,7 +58,8 @@ def index(request):
         'offset': offset,
         'sitios_con_engagement': sitios_con_engagement,
         'etiquetas': etiquetas, 
-        'totales_engagement': totales_engagement
+        'totales_engagement': totales_engagement,
+        'colores_aleatorios': colores_aleatorios,
     }
     return render(request, 'analis/index.html', context)
 

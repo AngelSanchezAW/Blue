@@ -13,47 +13,49 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="#">Blue</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarText">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Sitios Web
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#sitiosModal">Listar</a></li>
-                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSitioModal">Agregar</a></li>
-                      <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#actualizarSitioModal">Actualizar</a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#getPostModal">Publicaciones</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Reportes</a>
-                  </li>
-                </ul>
-                <span class="navbar-text">
-                  {% if user.is_authenticated %}
-                    {% if user.first_name and user.last_name %}
-                        <p>Bienvenido, {{ user.first_name }} {{ user.last_name }} </p>
-                    {% else %}
-                        <p>Bienvenido</p>
-                    {% endif %}
-                  {% endif %}
-                </span>
-              </div>
-            </div>
-        </nav>   
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Blue</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Sitios Web
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#sitiosModal">Listar</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#addSitioModal">Agregar</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#actualizarSitioModal">Actualizar</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#getPostModal">Publicaciones</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Reportes</a>
+            </li>
+          </ul>
+          <span class="navbar-text">
+            {% if user.is_authenticated %}
+              {% if user.first_name and user.last_name %}
+                  <p>Bienvenido, {{ user.first_name }} {{ user.last_name }} </p>
+              {% else %}
+                  <p>Bienvenido</p>
+              {% endif %}
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </nav> 
+  </div> 
+    <div class="container"> 
         <div class="container">
           <br>
           <div class="row">
@@ -62,32 +64,32 @@
                 <thead>
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Publicaciones</th>
+                    <th scope="col"></th>
+                    <th scope="col">Publicaciones <i>(Tola: {{ publicaciones|length }})</i></th>
                   </tr>
                 </thead>
                 <tbody>
                   
-                    {% for publicacion in page_obj %}
-                      <tr>
-                        <th scope="row">{{ offset|add:forloop.counter }}</th>
-                        <td>
-                          <b>
-                            <a href="{{ publicacion.url }}">
-                            {% if publicacion.titulo|length > 100 %}
-                              {{ publicacion.titulo|slice:":100" }}...
-                            {% else %}
-                              {{ publicacion.titulo }}
-                            {% endif %}
-                          </a>
-                          </b>
-                          <p class="infoPost">By {{ publicacion.sitio_web.nombre }} - {{ publicacion.fecha_creacion }} - Engagement: {{ publicacion.engagement_set.first.total_engagement }}</p>
-                        </td>
-                      </tr>
-                    {% endfor %}
+                  {% for publicacion in page_obj %}
+                    <tr onclick="window.location.href='{{ publicacion.url }}';" style="cursor: pointer;">
+                      <th class="number-post" scope="row">{{ offset|add:forloop.counter }}</th>
+                      <td class="align-middle"><img class="img-post" src="{{publicacion.imagen_portada}}" alt=""></td>
+                      <td class="align-middle">
+                        <b>
+                          {% if publicacion.titulo|length > 90 %}
+                            {{ publicacion.titulo|slice:":90" }}...
+                          {% else %}
+                            {{ publicacion.titulo }}
+                          {% endif %}
+                        </b>
+                        <p class="infoPost">By {{ publicacion.sitio_web.nombre }} - {{ publicacion.fecha_creacion }} - <span class="engagement">🔥 Engagement: {{ publicacion.engagement_set.first.total_engagement }}</span></p>
+                      </td>
+                    </tr>
+                {% endfor %}
                   
                 </tbody>
               </table>
-              <nav aria-label="Page navigation example">
+              <nav aria-label="Page navigation example" style="font-size: .8rem;">
                 <ul class="pagination">
                   <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
                     <a class="page-link" href="{% if page_obj.has_previous %}?page=1{% endif %}" aria-label="First">
@@ -118,8 +120,10 @@
               </nav> 
             </div>
             <div class="col-3">
+              <p><b>Popularidad de sitios web</b></p>
+              <canvas id="myChart"></canvas>
+              <br>
               <ol class="list-group list-group-numbered">
-                <p><b>Popularidad de sitios web</b></p>
                 {% for sitio in sitios_con_engagement %}
                   <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
@@ -129,7 +133,6 @@
                   </li>
                 {% endfor %}
               </ol>    
-              <!-- <canvas id="myChart"></canvas> -->
             </div>
           </div>  
         </div>
@@ -395,6 +398,7 @@
     <script>
       var etiquetas = {{ etiquetas|safe }};
       var totalesEngagement = {{ totales_engagement|safe }};
+      var coloresAleatorios = {{ colores_aleatorios|safe }};
 
       // Obtén el elemento del canvas donde se mostrará el gráfico
       var engagementCanvas = document.getElementById("myChart");
@@ -404,18 +408,14 @@
         labels: etiquetas,
         datasets: [{
           data: totalesEngagement,
-          backgroundColor: [
-            "rgba(255, 0, 0, 0.5)",
-            "rgba(100, 255, 0, 0.5)",
-            "rgba(200, 50, 255, 0.5)",
-            "rgba(0, 100, 255, 0.5)"
-          ]
+          backgroundColor: coloresAleatorios, 
         }]
       };
 
       var polarAreaChart = new Chart(engagementCanvas, {
-        type: 'polarArea',
-        data: engagementData
+        type: 'doughnut',
+        data: engagementData,
+        
       });
     </script>
 </body>

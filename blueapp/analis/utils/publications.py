@@ -2,6 +2,7 @@ from analis.models import Publicacion, SitioWeb, Engagement
 from datetime import datetime
 import feedparser, requests
 from consts import TOKEN
+from bs4 import BeautifulSoup
 
 
 def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicaciones, number_post):
@@ -25,11 +26,32 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
         for post in posts:
             titulo = post.title
             url = post.link
+            summary = post.summary
+
+            if 'media_content' in post:
+                image_url = post.media_content[0]['url']
+            elif 'media_thumbnail' in post:
+                image_url = post.media_thumbnail[0]['url']
+            elif 'description' in post:
+                description = post.description
+                # Crear un objeto BeautifulSoup para analizar el HTML de la descripción
+                soup = BeautifulSoup(description, 'html.parser')
+                img_tag = soup.find('img')
+                if img_tag:
+                    image_url = img_tag.get('src')
+                else:
+                     image_url = 'https://www.azulschool.net/wp-content/uploads/2023/07/Image-Testemonials-1.jpeg'  # Reemplaza con la URL por defecto que desees
+            else:
+                image_url = 'https://www.azulschool.net/wp-content/uploads/2023/07/Image-Testemonials-1.jpeg'  # Reemplaza con la URL por defecto que desees
+
+
 
             if not Publicacion.objects.filter(url=url).exists():
                 publicacion = Publicacion(
                     sitio_web=sitio_web,
                     titulo=titulo,
+                    imagen_portada = image_url,
+                    extracto = summary,
                     url=url,
                     fecha_creacion=fecha_actual
                 )

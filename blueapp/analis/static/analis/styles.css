@@ -12,3 +12,34 @@ p.infoPost {
     font-size: .8rem;
     color: #a4a4a4;
 }
+
+.engagement{
+    background: #303030b5;
+    color: white;
+    padding: 3px;
+    border-radius: 3px;
+    float: right;
+    font-size: .7rem;
+    width: 130px;
+}
+
+.number-post{
+    z-index: 2 !important;
+    position: absolute !important;
+    background: white !important;
+    padding: 1px 5px 1px 5px !important;
+}
+
+img.img-post {
+    width: 100px;
+    height: 67px;
+    background-size: cover;
+    margin-left: -33px;
+    z-index: 1;
+    position: relative;
+}
+
+canvas#myChart {
+    background: #dfdfdf;
+    padding: 13px;
+}
