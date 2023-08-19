@@ -1,5 +1,5 @@
 from analis.models import Publicacion, SitioWeb, Engagement
-from datetime import datetime
+from django.utils import timezone
 import feedparser, requests
 from consts import TOKEN
 from bs4 import BeautifulSoup
@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicaciones, number_post):
 
-    fecha_actual = datetime.now()
+    fecha_actual = timezone.now()
     sitios_web_queryset = SitioWeb.objects.all()
     nuevas_publicaciones = []  # Crear una lista para almacenar las nuevas publicaciones
 
@@ -24,26 +24,17 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
             posts = feed.entries[:number_post]  # Obtener un número específico de publicaciones
 
         for post in posts:
+            
             titulo = post.title
             url = post.link
-            summary = post.summary
 
-            if 'media_content' in post:
-                image_url = post.media_content[0]['url']
-            elif 'media_thumbnail' in post:
-                image_url = post.media_thumbnail[0]['url']
-            elif 'description' in post:
-                description = post.description
-                # Crear un objeto BeautifulSoup para analizar el HTML de la descripción
-                soup = BeautifulSoup(description, 'html.parser')
-                img_tag = soup.find('img')
-                if img_tag:
-                    image_url = img_tag.get('src')
-                else:
-                     image_url = 'https://www.azulschool.net/wp-content/uploads/2023/07/Image-Testemonials-1.jpeg'  # Reemplaza con la URL por defecto que desees
-            else:
-                image_url = 'https://www.azulschool.net/wp-content/uploads/2023/07/Image-Testemonials-1.jpeg'  # Reemplaza con la URL por defecto que desees
-
+            getPost(url)
+            imagenportada, content = getPost(url)
+            summary = content
+            # Si no hay imagen de portada, asignar una por defecto
+            if imagenportada is None:
+                imagenportada = "#"
+            image_url = imagenportada
 
 
             if not Publicacion.objects.filter(url=url).exists():
@@ -91,3 +82,26 @@ def analizar_fb(nuevas_publicaciones):
         )
         # Guardar el objeto Engagement en la base de datos
         engagement.save()
+
+def getPost(ulrPost):
+    
+    url = "https://getpost.azulweb.net/parse"
+    headers = {
+        "x-api-key": "kIjsmfjH7853jjs7h4la05ajGf4"
+    }
+    data = {
+        "url": ulrPost
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+
+    if response.status_code == 200:
+        parsed_data = response.json()
+        
+        imagenportada = parsed_data.get("lead_image_url", "#")
+        content = parsed_data.get("content", "#")
+        
+        return(imagenportada,content)
+
+    else:
+        print("Error:", response.status_code)

@@ -5,12 +5,17 @@ from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
+from django.db.models.functions import TruncDate
 import random
 
 # Vista página de inicio (Index) 
 def index(request):
     sitios_web = SitioWeb.objects.all()
-    publicaciones = Publicacion.objects.all().order_by('-engagement__total_engagement')
+
+    publicaciones = Publicacion.objects.annotate(
+        fecha_truncada=TruncDate('fecha_creacion')
+    ).order_by('-fecha_truncada', '-engagement__total_engagement')
+
     engagement = Engagement.objects.all()
 
     paginator = Paginator(publicaciones, 25)
@@ -119,3 +124,28 @@ def actualizar_sitio_web(request, sitio_web_id):
 
         return redirect('index')
     return render(request, 'analis/index.htmll')
+
+def get_publication_details(request):
+    if request.method == 'GET':
+        publicacion_id = request.GET.get('publicacion_id')
+        try:
+            
+            publicacion = Publicacion.objects.get(publicacion_id=publicacion_id)
+            sitioweb = publicacion.sitio_web
+            nombre_sitioweb = sitioweb.nombre
+            url_sitioweb = sitioweb.url
+            engagement = Engagement.objects.get(publicacion=publicacion)
+            
+            data = {
+                'nombreSitioWeb': nombre_sitioweb,
+                'urlSitioWeb': url_sitioweb,
+                'titulo': publicacion.titulo,
+                'postUrl': publicacion.url,
+                'extracto': publicacion.extracto,
+                'imagenPortada': publicacion.imagen_portada,
+                'engagemet': engagement.total_engagement,
+            }
+            return JsonResponse(data)
+        except (Publicacion.DoesNotExist, Engagement.DoesNotExist):
+            return JsonResponse({'error': 'Publicación o engagement no encontrados'})
+    return JsonResponse({'error': 'Invalid request'})
