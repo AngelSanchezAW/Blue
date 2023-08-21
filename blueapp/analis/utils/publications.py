@@ -1,8 +1,7 @@
 from analis.models import Publicacion, SitioWeb, Engagement
 from django.utils import timezone
 import feedparser, requests
-from consts import TOKEN
-from bs4 import BeautifulSoup
+from consts import TOKEN, APIKEY
 
 
 def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicaciones, number_post):
@@ -23,32 +22,42 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
         else:
             posts = feed.entries[:number_post]  # Obtener un número específico de publicaciones
 
+        # Mostrar el numero de publicaciones a analizar.
+        num_entries = len(feed.entries)
+        print(f"Estas por procesar: {num_entries} publicaciones de {sitio_web.nombre}")    
+
         for post in posts:
             
             titulo = post.title
             url = post.link
 
-            getPost(url)
-            imagenportada, content = getPost(url)
-            summary = content
-            # Si no hay imagen de portada, asignar una por defecto
-            if imagenportada is None:
-                imagenportada = "#"
-            image_url = imagenportada
-
-
             if not Publicacion.objects.filter(url=url).exists():
-                publicacion = Publicacion(
+
+                response = getPost(url)
+                if response is not None:
+                    imagenportada, content = response
+                    summary = content
+                    
+                    # Si no hay imagen de portada, asignar una por defecto
+                    if imagenportada is None:
+                        imagenportada = "#"
+                    image_url = imagenportada
+
+                    publicacion = Publicacion(
                     sitio_web=sitio_web,
                     titulo=titulo,
                     imagen_portada = image_url,
                     extracto = summary,
                     url=url,
                     fecha_creacion=fecha_actual
-                )
-                publicacion.save()
-                nuevas_publicaciones.append(url)  # Agregar la URL a la lista de nuevas publicaciones
+                    )
+                    publicacion.save()
+                    nuevas_publicaciones.append(url)  # Agregar la URL a la lista de nuevas publicaciones
+                else:
+                    print(f"Hay un problema con la url: {url}")    
+
     analizar_fb(nuevas_publicaciones)
+
 
 def analizar_fb(nuevas_publicaciones):
 
@@ -83,11 +92,12 @@ def analizar_fb(nuevas_publicaciones):
         # Guardar el objeto Engagement en la base de datos
         engagement.save()
 
+
 def getPost(ulrPost):
-    
+
     url = "https://getpost.azulweb.net/parse"
     headers = {
-        "x-api-key": "kIjsmfjH7853jjs7h4la05ajGf4"
+        "x-api-key": APIKEY
     }
     data = {
         "url": ulrPost
@@ -97,10 +107,10 @@ def getPost(ulrPost):
 
     if response.status_code == 200:
         parsed_data = response.json()
-        
+
         imagenportada = parsed_data.get("lead_image_url", "#")
         content = parsed_data.get("content", "#")
-        
+
         return(imagenportada,content)
 
     else:

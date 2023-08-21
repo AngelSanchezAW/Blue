@@ -1,5 +1,14 @@
 *{
-    font-family: 'Figtree', sans-serif;
+    font-family: 'Noto Serif', serif;
+}
+
+p {
+    font-size: 18px;
+}
+
+.modal-body {
+    border: solid 1px #424242;
+    padding: 15px 30px 15px 30px !important;
 }
 
 span.borrar-sitio-btn.badge.bg-danger.rounded-pill{
