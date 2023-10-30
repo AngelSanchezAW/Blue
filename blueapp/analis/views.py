@@ -6,7 +6,8 @@ from .utils.publications import ultimas_publicaciones
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
-import random
+from .utils.forms import DateFilterForm 
+
 
 # Vista página de inicio (Index) 
 def index(request):
@@ -15,6 +16,21 @@ def index(request):
     publicaciones = Publicacion.objects.annotate(
         fecha_truncada=TruncDate('fecha_creacion')
     ).order_by('-fecha_truncada', '-engagement__total_engagement')
+
+    # Procesar el formulario de filtro de fechas
+    date_filter_form = DateFilterForm(request.GET)
+    if date_filter_form.is_valid():
+        start_date = date_filter_form.cleaned_data['start_date']
+        end_date = date_filter_form.cleaned_data['end_date']
+        
+        if start_date:
+            publicaciones = publicaciones.filter(fecha_creacion__gte=start_date)
+        if end_date:
+            publicaciones = publicaciones.filter(fecha_creacion__lte=end_date)
+
+    # Obtener las variables de fecha del formulario
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
     engagement = Engagement.objects.all()
 
@@ -50,8 +66,7 @@ def index(request):
     etiquetas = [sitio.nombre for sitio in sitios_con_engagement]
     totales_engagement = [sitio.total_engagement for sitio in sitios_con_engagement]
 
-    # Genera colores aleatorios en formato hexadecimal
-    colores_aleatorios = ['#{:02x}{:02x}{:02x}'.format(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in sitios_con_engagement]   
+    
 
     context = {
         'sitios_web': sitios_web,
@@ -64,7 +79,9 @@ def index(request):
         'sitios_con_engagement': sitios_con_engagement,
         'etiquetas': etiquetas, 
         'totales_engagement': totales_engagement,
-        'colores_aleatorios': colores_aleatorios,
+        'date_filter_form': date_filter_form,
+        'start_date': start_date,  
+        'end_date': end_date,  
     }
     return render(request, 'analis/index.html', context)
 
