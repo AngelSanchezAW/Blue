@@ -10,6 +10,7 @@ from django.db.models.functions import TruncDate
 from .utils.forms import DateFilterForm 
 from datetime import timedelta
 from django.views.decorators.http import require_POST
+from bs4 import BeautifulSoup
 
 
 # Vista página de inicio (Index) 
@@ -180,12 +181,16 @@ def get_publication_details(request):
 def generate_ia_post(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
-        
-        titulo = data.get('titulo', '')  # Obtener el título del diccionario o cadena vacía si no está presente
-        extracto = data.get('extracto', '')  # Obtener el extracto del diccionario o cadena vacía si no está presente
+
+        titulo = data.get('titulo', '')
+        extracto_html = data.get('extracto', '')
+
+        # Utilizar BeautifulSoup para obtener solo el texto del código HTML
+        soup = BeautifulSoup(extracto_html, 'html.parser')
+        extracto_texto = soup.get_text()
 
         print('Título:', titulo)
-        print('Extracto:', extracto)
+        print('Extracto (Texto):', extracto_texto)
 
         return JsonResponse({'message': 'Datos recibidos con éxito'})
     except json.JSONDecodeError as e:
