@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
 from .utils.forms import DateFilterForm 
+from datetime import timedelta
 
 
 # Vista página de inicio (Index) 
@@ -26,7 +27,9 @@ def index(request):
         if start_date:
             publicaciones = publicaciones.filter(fecha_creacion__gte=start_date)
         if end_date:
-            publicaciones = publicaciones.filter(fecha_creacion__lte=end_date)
+            # Incluir publicaciones hasta el final del día
+            end_date_next_day = end_date + timedelta(days=1)
+            publicaciones = publicaciones.filter(fecha_creacion__lte=end_date_next_day)
 
     # Obtener las variables de fecha del formulario
     start_date = request.GET.get('start_date')
