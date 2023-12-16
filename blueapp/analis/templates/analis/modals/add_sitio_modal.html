@@ -1,0 +1,31 @@
+<!-- Agregar Sitio Web-->
+<div class="modal fade modal-dialog-scrollable" id="addSitioModal" tabindex="-1" aria-labelledby="addSitioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="addSitioModalLabel">Agregar nuevo Sitio Web</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            {% if user.is_superuser %}
+              <form method="post" action="{% url 'agregar_sitio_web' %}">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                      <label for="sitioNombre" class="form-label">Nombre</label>
+                      <input type="text" class="form-control" id="sitioNombre" name="sitioNombre">
+                      <br> 
+                      <label for="sitioUrl" class="form-label">URL</label>
+                      <input type="text" class="form-control" id="sitioUrl" name="sitioUrl">
+                      <br>
+                      <label for="sitioRSS" class="form-label">URL RSS</label>
+                      <input type="text" class="form-control" id="sitioRSS" name="sitioRSS">
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="float: right;">Agregar</button>
+              </form>
+            {% else %}
+              <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas agregar sitios web nuevos a Blue.</p>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>

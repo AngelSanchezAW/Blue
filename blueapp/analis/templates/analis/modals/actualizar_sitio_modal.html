@@ -1,0 +1,39 @@
+<!-- Actualizar Sitio Web-->
+<div class="modal fade modal-dialog-scrollable" id="actualizarSitioModal" tabindex="-1" aria-labelledby="actualizarSitioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="actualizarSitioModalLabel">Actualizar Sitio Web</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              {% if user.is_superuser %}
+                <form method="post" action="" id="actualizarSitioForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="sitiosDataList" class="form-label">Eelegir Sitio Web</label>
+                        <input class="form-control" list="datalistOptions" id="sitiosDataList" placeholder="Eelegir sitio..">
+                        <datalist id="datalistOptions">
+                          {% for sitio in sitios_web %}
+                          <option value="{{ sitio.nombre }}" data-id="{{ sitio.sitio_web_id }}" data-url="{{ sitio.url }}" data-rss="{{ sitio.feed_url }}">
+                          {% endfor %}  
+                        </datalist>
+                        <br>
+                        <label for="actualizarSitioNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="actualizarSitioNombre" name="actualizarSitioNombre">
+                        <br> 
+                        <label for="actualizarSitioUrl" class="form-label">URL</label>
+                        <input type="text" class="form-control" id="actualizarSitioUrl" name="actualizarSitioUrl">
+                        <br>
+                        <label for="actualizarSitioRSS" class="form-label">URL RSS</label>
+                        <input type="text" class="form-control" id="actualizarSitioRSS" name="actualizarSitioRSS">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="float: right;">Actualizar</button>
+                </form>
+              {% else %}
+                <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
+              {% endif %}
+          </div>
+      </div>
+    </div>
+  </div>

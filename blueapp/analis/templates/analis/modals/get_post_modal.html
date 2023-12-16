@@ -1,0 +1,73 @@
+<!-- Obtener Post-->
+<div class="modal fade modal-dialog-scrollable" id="getPostModal" tabindex="-1" aria-labelledby="getPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="getPostModalLabel">Optener publicaciones de Sitios Web</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              {% if user.is_superuser %}
+              <form method="POST" action="{% url 'get-post' %}">
+                {% csrf_token %}
+                <p><b>¿De que sitios web deseas traer información?</b></p>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="todosSitios" id="todosSitios" checked>
+                  <label for="todosSitios">Todos los sitios web</label>
+                </div>
+                <label for="sitiosWeb">De sitios web en espesifico:</label>
+                <select class="form-select" multiple aria-label="multiple select" name="sitiosWeb">
+                  {% for sitio in sitios_web %}
+                    <option value="{{ sitio.sitio_web_id }}" id="sitio_{{ sitio.sitio_web_id }}">{{ sitio.nombre }}</option>
+                  {% endfor %}
+                </select>
+                <hr>
+                <p><b>¿Cúantas publicaciones por sitio deseas traer?</b></p>
+                <input class="form-check-input" type="checkbox" name="todasPublicaciones" id="todasPublicaciones" checked>
+                <label for="todasPublicaciones"> Todas las disponibles</label>
+                <br>
+                <label for="numberPostGet">Número de publicaciones a traer:</label>
+                <input class="form-control" type="number" name="numberPostGet" id="numberPostGet" min="1">
+                <i class="fw-lighter"style="font-size: .7rem;">Puedes elegir el numero de publicaciones a traer, pero siempre estarás limitado a el numero máximo de publicaciones disponibles en el FEED de cada sitio web.</i>
+                <br><br>
+                <button type="submit" class="btn btn-primary" style="float: right;">Optener publicaciones</button>
+            </form>   
+            <script>
+                const numberPostGetInput = document.getElementById('numberPostGet');
+                const todasPublicacionesInput = document.getElementById('todasPublicaciones');
+                const todosSitiosInput = document.getElementById('todosSitios');
+                const sitiosWebCheckboxes = document.querySelectorAll('[name="sitiosWeb"]');
+            
+                // Función para deshabilitar o habilitar el campo numberPostGet según el estado de todasPublicaciones
+                function toggleNumberPostGet() {
+                    numberPostGetInput.disabled = todasPublicacionesInput.checked;
+                }
+            
+                // Función para deshabilitar o habilitar los checkboxes de sitiosWeb según el estado de todosSitios
+                function toggleSitiosWebCheckboxes() {
+                    for (const checkbox of sitiosWebCheckboxes) {
+                        checkbox.disabled = todosSitiosInput.checked;
+                    }
+                }
+            
+                // Agregar event listeners a todasPublicacionesInput y todosSitiosInput
+                todasPublicacionesInput.addEventListener('change', function () {
+                    toggleNumberPostGet();
+                });
+            
+                todosSitiosInput.addEventListener('change', function () {
+                    toggleSitiosWebCheckboxes();
+                });
+            
+                // Llamar a las funciones para configurar el estado inicial del formulario
+                toggleNumberPostGet();
+                toggleSitiosWebCheckboxes();
+            </script>
+            
+              {% else %}
+                <p>🚫 Esta opción solo esta disponible para administradores. Inicia sesión si deseas actualizar sitios web en Blue.</p>
+              {% endif %}
+          </div>
+      </div>
+    </div>
+</div>

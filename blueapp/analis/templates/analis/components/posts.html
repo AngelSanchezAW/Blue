@@ -1,0 +1,78 @@
+<div class="container"> 
+    <div class="container">
+      <br>
+      <div class="row">
+        <div>
+          <form method="get" action="">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="{{ date_filter_form.start_date.id_for_label }}">Fecha de inicio:</label>
+                    {{ date_filter_form.start_date }}
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="{{ date_filter_form.end_date.id_for_label }}">Fecha de fin:</label>
+                    {{ date_filter_form.end_date }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>            
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col"></th>
+                <th scope="col">Publicaciones <i>(Tola: {{ publicaciones|length }})</i></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for publicacion in page_obj %}
+                <tr data-bs-toggle="modal" data-bs-target="#vistaPreviaModal" data-publicacion-id="{{ publicacion.publicacion_id }}" style="cursor: pointer;">
+                  <th class="number-post" scope="row">{{ offset|add:forloop.counter }}</th>
+                  <td class="align-middle"><img class="img-post" src="{{publicacion.imagen_portada}}" alt=""></td>
+                  <td class="align-middle">
+                    <p><b>
+                      {% if publicacion.titulo|length > 130 %}
+                        {{ publicacion.titulo|slice:":130" }}...
+                      {% else %}
+                        {{ publicacion.titulo }}
+                      {% endif %}
+                    </p></b>
+                    <p class="infoPost">By {{ publicacion.sitio_web.nombre }} - {{ publicacion.fecha_creacion }} - <span class="engagement">🔥 Engagement: {{ publicacion.engagement_set.first.total_engagement }}</span></p>
+                  </td>
+                </tr>
+              {% endfor%}              
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation example" style="font-size: .8rem;">
+            <ul class="pagination">
+              <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="{% if page_obj.has_previous %}?page=1{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" aria-label="First">
+                  <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              {% for page in page_range %}
+                <li class="page-item {% if page_obj.number == page %}active{% endif %}">
+                  <a class="page-link" href="?page={{ page }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}">{{ page }}</a>
+                </li>
+              {% endfor %}
+              <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+              <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" aria-label="Last">
+                  <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav> 
+        </div>
+      </div>  
+    </div>
+</div>

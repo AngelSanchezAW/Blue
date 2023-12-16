@@ -1,0 +1,57 @@
+<!-- Modal Sitios Web-->
+<div class="modal fade modal-dialog-scrollable" id="sitiosModal" tabindex="-1" aria-labelledby="sitiosModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="sitiosModalLabel">Sitios Web</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <ol id="siteList" class="list-group list-group-numbered">
+                <p>Total de Sitios Web: {{ sitios_web.count }}</p>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar sitio web...">
+                <br>
+                {% for sitio in sitios_web %}
+                    <li id="sitio-web-{{ sitio.sitio_web_id }}" class="list-group-item d-flex justify-content-between align-items-start sitio-item">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold"><a href="{{ sitio.url }}">{{ sitio.nombre }}</a></div>
+                            <b>Nombre: </b>{{ sitio.nombre }} <br>  
+                            <b>URL: </b>{{ sitio.url }} <br>
+                            <b>URL FEED: </b>{{ sitio.feed_url }} <br>
+                            <b>Numero de post:</b> 
+                            {% for sitio_web, num_publicaciones in num_publicaciones_por_sitio.items %}
+                                {% if sitio == sitio_web %}
+                                    {{ num_publicaciones }}
+                                {% endif %}
+                            {% endfor %} 
+                        </div>
+                        {% if user.is_superuser %}
+                        <span id="boton-borrar-sitio-web-{{ sitio.sitio_web_id }}" class="borrar-sitio-btn badge bg-danger rounded-pill">Borrar</span>
+                        {% endif %}                  
+                    </li>
+                {% endfor %}
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var searchInput = document.getElementById("searchInput");
+                        searchInput.addEventListener("keyup", function() {
+                            var value = this.value.toLowerCase();
+                            var sitioItems = document.getElementsByClassName("sitio-item");
+            
+                            for (var i = 0; i < sitioItems.length; i++) {
+                                var sitioItem = sitioItems[i];
+                                var sitioName = sitioItem.querySelectorAll(".fw-bold")[0].textContent.toLowerCase();
+                                
+                                if (sitioName.includes(value)) {
+                                    sitioItem.style.cssText = "display: flex !important";
+                                } else {
+                                sitioItem.style.cssText = "display: none !important";
+                                }
+                            }
+                        });
+                    });
+                </script>
+            </ol> 
+        </div>
+    </div>
+    </div>
+</div>
