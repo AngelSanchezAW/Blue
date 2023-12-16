@@ -49,11 +49,6 @@ img.img-post {
     position: relative;
 }
 
-canvas#myChart {
-    background: #dfdfdf;
-    padding: 13px;
-}
-
 .container.CuerpoVistaPreviaPost img {
     width: 100%;
     margin-bottom: 10px;
@@ -64,4 +59,15 @@ canvas#myChart {
     border: 0;
     width: 100%;
     height: 435px;
+}
+
+.options {
+    padding: 5px;
+    position: fixed;
+    background: lightgrey;
+    border-radius: 5px;
+}
+
+.options img {
+    width: 33px;
 }

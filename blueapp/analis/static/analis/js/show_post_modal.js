@@ -18,11 +18,42 @@ document.addEventListener("DOMContentLoaded", function() {
             <img src="${data.imagenPortada}">
             <hr>
             <div>${data.extracto}</div>
+            <button id="enviarDatosBtn" class="btn btn-primary">Enviar Datos</button>
           </div>
         `;
+        const enviarDatosBtn = document.getElementById("enviarDatosBtn");
+        enviarDatosBtn.addEventListener("click", function() {
+          enviarDatos(data.titulo, data.extracto);
+        })
       })
       .catch(error => {
         console.log("Error fetching publication details", error);
       });
   });
 });
+
+function enviarDatos(titulo, extracto) {
+  // Puedes ajustar la URL según la configuración de tus URLs en Django
+  const url = 'generate_ia_post/';
+
+  // Enviar datos a la vista mediante una solicitud POST
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken,
+    },
+    body: JSON.stringify({
+      titulo: titulo,
+      extracto: extracto,
+    }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Datos enviados con éxito', data);
+    })
+    .catch(error => {
+      console.error('Error al enviar datos', error);
+    });
+}

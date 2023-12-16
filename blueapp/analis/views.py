@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+import json
 from .models import SitioWeb, Publicacion, Engagement
 from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
@@ -8,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
 from .utils.forms import DateFilterForm 
 from datetime import timedelta
+from django.views.decorators.http import require_POST
 
 
 # Vista página de inicio (Index) 
@@ -30,6 +32,10 @@ def index(request):
             # Incluir publicaciones hasta el final del día
             end_date_next_day = end_date + timedelta(days=1)
             publicaciones = publicaciones.filter(fecha_creacion__lte=end_date_next_day)
+
+        if start_date and end_date:    
+            # Después del filtro, ordena por engagement de forma descendente
+            publicaciones = publicaciones.order_by('-engagement__total_engagement')    
 
     # Obtener las variables de fecha del formulario
     start_date = request.GET.get('start_date')
@@ -68,8 +74,6 @@ def index(request):
 
     etiquetas = [sitio.nombre for sitio in sitios_con_engagement]
     totales_engagement = [sitio.total_engagement for sitio in sitios_con_engagement]
-
-    
 
     context = {
         'sitios_web': sitios_web,
@@ -169,3 +173,21 @@ def get_publication_details(request):
         except (Publicacion.DoesNotExist, Engagement.DoesNotExist):
             return JsonResponse({'error': 'Publicación o engagement no encontrados'})
     return JsonResponse({'error': 'Invalid request'})
+
+@require_POST
+# Vista para actualizar, solo accesible para administradores
+@user_passes_test(lambda u: u.is_superuser)
+def generate_ia_post(request):
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        
+        titulo = data.get('titulo', '')  # Obtener el título del diccionario o cadena vacía si no está presente
+        extracto = data.get('extracto', '')  # Obtener el extracto del diccionario o cadena vacía si no está presente
+
+        print('Título:', titulo)
+        print('Extracto:', extracto)
+
+        return JsonResponse({'message': 'Datos recibidos con éxito'})
+    except json.JSONDecodeError as e:
+        # Manejar errores de decodificación JSON
+        return JsonResponse({'error': 'Error en la decodificación JSON'}, status=400)
