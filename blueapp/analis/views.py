@@ -185,14 +185,22 @@ def generate_ia_post(request):
 
         titulo = data.get('titulo', '')
         extracto_html = data.get('extracto', '')
+        nombreSitioWeb = data.get('nombreSitioWeb', '')
+        urlSitioWeb = data.get('urlSitioWeb', '')
+        postUrl = data.get('postUrl', '')
 
         # Utilizar BeautifulSoup para obtener solo el texto del código HTML
         soup = BeautifulSoup(extracto_html, 'html.parser')
         extracto_texto = soup.get_text()
 
-        ai_post_instance = new_ai_post(titulo, extracto_texto)
+        print(titulo)
+        print(nombreSitioWeb)
+        print(urlSitioWeb)
+        print(postUrl)
 
-        print('Articulo generado con IA:', ai_post_instance)
+        #ai_post_instance = new_ai_post(titulo, extracto_texto)
+
+        #print('Articulo generado con IA:', ai_post_instance)
 
         return JsonResponse({'message': 'Datos recibidos con éxito'})
     except json.JSONDecodeError as e:

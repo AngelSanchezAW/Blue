@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
         `;
         const enviarDatosBtn = document.getElementById("enviarDatosBtn");
         enviarDatosBtn.addEventListener("click", function() {
-          enviarDatos(data.titulo, data.extracto);
+          enviarDatos(data.titulo, data.extracto,data.nombreSitioWeb,data.urlSitioWeb,data.postUrl);
         })
       })
       .catch(error => {
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
-function enviarDatos(titulo, extracto) {
+function enviarDatos(titulo, extracto, nombreSitioWeb, urlSitioWeb, postUrl) {
   // Puedes ajustar la URL según la configuración de tus URLs en Django
   const url = 'generate_ia_post/';
 
@@ -47,6 +47,9 @@ function enviarDatos(titulo, extracto) {
     body: JSON.stringify({
       titulo: titulo,
       extracto: extracto,
+      nombreSitioWeb: nombreSitioWeb,
+      urlSitioWeb: urlSitioWeb,
+      postUrl: postUrl,
     }),
   })
     .then(response => response.json())
