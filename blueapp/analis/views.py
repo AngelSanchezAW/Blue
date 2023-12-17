@@ -4,6 +4,7 @@ import json
 from .models import SitioWeb, Publicacion, Engagement
 from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
+from .utils.new_ai_post import new_ai_post
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 from django.db.models.functions import TruncDate
@@ -189,8 +190,9 @@ def generate_ia_post(request):
         soup = BeautifulSoup(extracto_html, 'html.parser')
         extracto_texto = soup.get_text()
 
-        print('Título:', titulo)
-        print('Extracto (Texto):', extracto_texto)
+        ai_post_instance = new_ai_post(titulo, extracto_texto)
+
+        print('Articulo generado con IA:', ai_post_instance)
 
         return JsonResponse({'message': 'Datos recibidos con éxito'})
     except json.JSONDecodeError as e:
