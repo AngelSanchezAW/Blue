@@ -198,9 +198,9 @@ def generate_ia_post(request):
         print(urlSitioWeb)
         print(postUrl)
 
-        #ai_post_instance = new_ai_post(titulo, extracto_texto)
+        ai_post_instance = new_ai_post(titulo, extracto_texto)
 
-        #print('Articulo generado con IA:', ai_post_instance)
+        print('Articulo generado con IA:', ai_post_instance)
 
         return JsonResponse({'message': 'Datos recibidos con éxito'})
     except json.JSONDecodeError as e:

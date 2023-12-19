@@ -23,3 +23,9 @@ class Engagement(models.Model):
     veces_compartidas = models.IntegerField()
     comentarios_sitios_web = models.IntegerField()
     total_engagement = models.IntegerField()
+
+class ArticuloGenerado(models.Model):
+    articulo_id = models.IntegerField(primary_key=True)
+    publicacion = models.OneToOneField(Publicacion, on_delete=models.CASCADE)
+    contenido_generado = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
