@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 import json
-from .models import SitioWeb, Publicacion, Engagement
+from .models import SitioWeb, Publicacion, Engagement, ArticuloGenerado
 from django.db.models import Sum
 from .utils.publications import ultimas_publicaciones
 from .utils.new_ai_post import new_ai_post
@@ -149,7 +149,7 @@ def actualizar_sitio_web(request, sitio_web_id):
         sitio_web.save()
 
         return redirect('index')
-    return render(request, 'analis/index.htmll')
+    return render(request, 'analis/index.html')
 
 def get_publication_details(request):
     if request.method == 'GET':
@@ -183,7 +183,7 @@ def generate_ia_post(request):
     try:
         data = json.loads(request.body.decode('utf-8'))
 
-        titulo = data.get('titulo', '')
+        titulo_new_post = data.get('titulo', '')
         extracto_html = data.get('extracto', '')
         nombreSitioWeb = data.get('nombreSitioWeb', '')
         urlSitioWeb = data.get('urlSitioWeb', '')
@@ -191,18 +191,16 @@ def generate_ia_post(request):
 
         # Utilizar BeautifulSoup para obtener solo el texto del código HTML
         soup = BeautifulSoup(extracto_html, 'html.parser')
-        extracto_texto = soup.get_text()
+        extracto_texto_new_post = soup.get_text()
 
-        print(titulo)
-        print(nombreSitioWeb)
-        print(urlSitioWeb)
-        print(postUrl)
-
-        ai_post_instance = new_ai_post(titulo, extracto_texto)
-
-        print('Articulo generado con IA:', ai_post_instance)
+        new_ai_post(nombreSitioWeb, urlSitioWeb, postUrl, titulo_new_post, extracto_texto_new_post)
 
         return JsonResponse({'message': 'Datos recibidos con éxito'})
     except json.JSONDecodeError as e:
-        # Manejar errores de decodificación JSON
         return JsonResponse({'error': 'Error en la decodificación JSON'}, status=400)
+    
+def ai_post(request):
+    posts_generados = ArticuloGenerado.objects.all().order_by('-fecha_creacion')
+
+    # Renderizar la plantilla 'post_ai.html' y enviar los posts generados como contexto
+    return render(request, 'analis/post_ai.html', {'posts_generados': posts_generados})    

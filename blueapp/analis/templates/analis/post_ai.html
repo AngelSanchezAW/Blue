@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  {% include 'analis/components/header.html' %}
+</head>
+<body>
+  <!-- Nave -->
+  {% include 'analis/components/nav.html' %}
+
+   <!-- Contenido de la página -->
+   <div class="container">
+    <br>
+    <h1>Lista de Posts Generados</h1>
+    <br>
+    <div class="accordion" id="accordionExample">
+      {% for post in posts_generados %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="heading{{ post.articulo_id }}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ post.articulo_id }}" aria-expanded="true" aria-controls="collapse{{ post.articulo_id }}">
+              {{ post.titulo }}
+            </button>
+          </h2>
+          <div id="collapse{{ post.articulo_id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ post.articulo_id }}" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              {{ post.contenido_generado|linebreaks }}
+              <!-- Otros campos del post si los tienes -->
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>        
+</body>
+</html>

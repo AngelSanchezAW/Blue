@@ -33,8 +33,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function enviarDatos(titulo, extracto, nombreSitioWeb, urlSitioWeb, postUrl) {
+  // Mostrar el GIF de carga
+  const loadingGif = document.getElementById('loadingGif');
+  loadingGif.style.display = 'block';
+  
   // Puedes ajustar la URL según la configuración de tus URLs en Django
-  const url = 'generate_ia_post/';
+  const url = 'new_ai_post/';
 
   // Enviar datos a la vista mediante una solicitud POST
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -52,11 +56,13 @@ function enviarDatos(titulo, extracto, nombreSitioWeb, urlSitioWeb, postUrl) {
       postUrl: postUrl,
     }),
   })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Datos enviados con éxito', data);
-    })
-    .catch(error => {
-      console.error('Error al enviar datos', error);
-    });
+  .then(response => response.json())
+  .then(data => {
+    console.log('Datos enviados con éxito', data);
+    // Redireccionar al usuario a la página 'ai_post' después del éxito
+    window.location.href = '/ai_post/';
+  })
+  .catch(error => {
+    console.error('Error al enviar datos', error);
+  });
 }

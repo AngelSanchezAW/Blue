@@ -1,23 +1,16 @@
+from analis.models import ArticuloGenerado
 from openai import OpenAI
 from consts import APIKEYOAI
 
 client = OpenAI(api_key=APIKEYOAI)
 from consts import APIKEYOAI
 
-def new_ai_post(titulo,extracto_texto):
-
-    print ("Se inicio correctamente la función new_ai_post")
-
-    if titulo:
-        print ("Se recibio el valor del titulo")
-
-    if extracto_texto:
-        print ("Se recivio el valor del extrato de texto")
+def new_ai_post(nombreSitioWeb, urlSitioWeb, postUrl, titulo_new_post, extracto_texto_new_post):
 
     # Establecer la clave de API de OpenAI
 
 
-    prompt = f"Crea un articulo original optimizado para SEO con esta información: {titulo} {extracto_texto}"
+    prompt = f"Crea un articulo original optimizado para SEO con esta información: {titulo_new_post} {extracto_texto_new_post}"
 
     # Configurar el modelo de lenguaje
     modelo = "gpt-3.5-turbo"
@@ -30,8 +23,19 @@ def new_ai_post(titulo,extracto_texto):
     response = client.chat.completions.create(model=modelo,
     messages=mensaje,
     temperature=0.8,
-    max_tokens=1024)
+    max_tokens=2024)
 
     respuesta = response.choices[0].message.content
 
-    return respuesta
+    # Crear una instancia de ArticuloGenerado y guardarla en la base de datos
+    ai_post_instance = ArticuloGenerado.objects.create(
+        contenido_generado=respuesta,
+        titulo=titulo_new_post,
+        nombre_sitio_web=nombreSitioWeb,
+        url_sitio_web=urlSitioWeb,
+        post_url=postUrl
+    )
+
+    print("Artículo generado con éxito y guardado en la base de datos")
+
+    return ai_post_instance 

@@ -9,5 +9,6 @@ urlpatterns = [
     path('agregar_sitio_web/', views.agregar_sitio_web, name='agregar_sitio_web'),
     path('actualizar_sitio_web/<int:sitio_web_id>/', views.actualizar_sitio_web, name='actualizar_sitio_web'),
     path('get_publication_details/', views.get_publication_details, name='get_publication_details'),
-    path('generate_ia_post/', views.generate_ia_post, name='generate_ia_post'),
+    path('new_ai_post/', views.generate_ia_post, name="new_ai_post"),
+    path('ai_post/', views.ai_post, name='ai_post'),
 ]

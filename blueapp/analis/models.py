@@ -26,6 +26,10 @@ class Engagement(models.Model):
 
 class ArticuloGenerado(models.Model):
     articulo_id = models.IntegerField(primary_key=True)
-    publicacion = models.OneToOneField(Publicacion, on_delete=models.CASCADE)
+    publicacion = models.OneToOneField(Publicacion, on_delete=models.CASCADE, null=True, blank=True)
     contenido_generado = models.TextField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    titulo = models.CharField(max_length=255, default='')
+    nombre_sitio_web = models.CharField(max_length=255, default='')
+    url_sitio_web = models.CharField(max_length=255, default='')
+    post_url = models.CharField(max_length=255, default='')

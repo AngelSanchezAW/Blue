@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import SitioWeb, Publicacion, Engagement
+from .models import SitioWeb, Publicacion, Engagement, ArticuloGenerado
 
 @admin.register(SitioWeb)
 class SitioWebAdmin(admin.ModelAdmin):
@@ -14,3 +14,6 @@ class PublicacionAdmin(admin.ModelAdmin):
 class EngagementAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(ArticuloGenerado)
+class ArticuloGeneradoAdmin(admin.ModelAdmin):
+    pass

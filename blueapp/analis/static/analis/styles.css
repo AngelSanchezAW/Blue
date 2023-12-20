@@ -71,3 +71,28 @@ img.img-post {
 .options img {
     width: 33px;
 }
+
+#loadingGif {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: url('img/p.gif') no-repeat center center;
+    background-size: contain;
+    z-index: 9999; /* Asegura que esté encima de todo */
+    display: none;
+}
+
+/* Personaliza el color de fondo del botón del acordeón cuando está cerrado */
+.accordion-button {
+    background-color: #ffffff !important;  /* Cambia esto al color que desees */
+    color: #000000 !important;  /* Cambia esto al color del texto que desees */
+}
+
+/* Personaliza el color de fondo del botón del acordeón cuando está abierto */
+.accordion-button[aria-expanded="true"] {
+    background-color: #ffffff;  /* Cambia esto al color que desees */
+    color: #000000;  /* Cambia esto al color del texto que desees */
+}
