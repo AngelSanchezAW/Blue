@@ -22,8 +22,8 @@ def new_ai_post(nombreSitioWeb, urlSitioWeb, postUrl, titulo_new_post, extracto_
     # Generar la respuesta utilizando la API de OpenAI
     response = client.chat.completions.create(model=modelo,
     messages=mensaje,
-    temperature=0.8,
-    max_tokens=2024)
+    temperature=1,
+    max_tokens=2000)
 
     respuesta = response.choices[0].message.content
 

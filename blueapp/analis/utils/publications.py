@@ -8,7 +8,7 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
 
     fecha_actual = timezone.now()
     sitios_web_queryset = SitioWeb.objects.all()
-    nuevas_publicaciones = []  # Crear una lista para almacenar las nuevas publicaciones
+    total_url_analizar = []  # Crear una lista para almacenar las nuevas publicaciones
 
     if not todos_sitios:
         sitios_web_queryset = sitios_web_queryset.filter(sitio_web_id__in=sitios_web_seleccionados)
@@ -31,6 +31,8 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
             titulo = post.title
             url = post.link
 
+            total_url_analizar.append(url)  
+            
             if not Publicacion.objects.filter(url=url).exists():
 
                 response = getPost(url)
@@ -52,46 +54,62 @@ def ultimas_publicaciones(todos_sitios, sitios_web_seleccionados, todas_publicac
                     fecha_creacion=fecha_actual
                     )
                     publicacion.save()
-                    nuevas_publicaciones.append(url)  # Agregar la URL a la lista de nuevas publicaciones
                 else:
                     print(f"Hay un problema con la url: {url}")    
+            else:
+                print(f"La URL {url} ya existe.")
+    analizar_fb(total_url_analizar)
 
-    analizar_fb(nuevas_publicaciones)
 
+def analizar_fb(total_url_analizar):
+    for url in total_url_analizar:
+        try:
+            # Obtener la Publicacion existente
+            publicacion = Publicacion.objects.get(url=url)
+        except Publicacion.DoesNotExist:
+            print(f"La publicación con URL {url} no existe en la base de datos.")
+            continue
 
-def analizar_fb(nuevas_publicaciones):
+        # Construir la URL para la API de Facebook
+        url_api = f"https://graph.facebook.com/?id={publicacion.url}&fields=engagement&access_token={TOKEN}"
 
-    publicaciones_existentes = Publicacion.objects.filter(url__in=nuevas_publicaciones)
-    ids_publicaciones_existentes = publicaciones_existentes.values_list('publicacion_id', flat=True)
-    # Combinar las dos listas utilizando zip
-    publicaciones_combinadas = zip(ids_publicaciones_existentes, publicaciones_existentes)
+        print(f"Se ha analizado en Facebook la url {publicacion.url}.")
 
-    for id_publicacion, publicacion in publicaciones_combinadas:
-        
-        url = f"https://graph.facebook.com/?id={publicacion.url}&fields=engagement&access_token={TOKEN}"
+        # Realizar la solicitud a la API de Facebook
+        response = requests.get(url_api)
+        try:
+            response.raise_for_status()  # Lanza una excepción para códigos de error HTTP
+            data = response.json()
+            engagement = data['engagement']
+            reacciones = engagement['reaction_count']
+            comentarios = engagement['comment_count']
+            veces_compartidas = engagement['share_count']
+            comentarios_sitios_web = engagement['comment_plugin_count']
+            total_engagement = reacciones + comentarios + veces_compartidas + comentarios_sitios_web
 
-        response = requests.get(url)
-        data = response.json()
-        engagement = data['engagement']
-        reacciones = engagement['reaction_count']
-        comentarios = engagement['comment_count']
-        veces_compartidas = engagement['share_count']
-        comentarios_sitios_web = engagement['comment_plugin_count']
-        total_engagement = reacciones + comentarios + veces_compartidas + comentarios_sitios_web
+            print(f"Cuenta con {total_engagement} de engagement.")
 
-        # Crear un objeto Engagement con los datos obtenidos
-        publicacion = Publicacion.objects.get(url=publicacion.url)
-        engagement = Engagement(
-            publicacion=publicacion,
-            reacciones=reacciones,
-            comentarios=comentarios,
-            veces_compartidas=veces_compartidas,
-            comentarios_sitios_web=comentarios_sitios_web,
-            total_engagement=total_engagement
-        )
-        # Guardar el objeto Engagement en la base de datos
-        engagement.save()
+            # Intentar obtener el objeto Engagement asociado a la Publicacion
+            try:
+                engagement_obj = Engagement.objects.get(publicacion=publicacion)
+            except Engagement.DoesNotExist:
+                # Si no existe, crear uno nuevo con valores predeterminados
+                engagement_obj = Engagement(publicacion=publicacion, reacciones=0, comentarios=0, veces_compartidas=0, comentarios_sitios_web=0, total_engagement=0)
 
+            # Actualizar los datos de engagement en el objeto Engagement
+            engagement_obj.reacciones = reacciones
+            engagement_obj.comentarios = comentarios
+            engagement_obj.veces_compartidas = veces_compartidas
+            engagement_obj.comentarios_sitios_web = comentarios_sitios_web
+            engagement_obj.total_engagement = total_engagement
+
+            # Guardar los cambios en el objeto Engagement
+            engagement_obj.save()
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud a Facebook para la URL {publicacion.url}: {e}")
+        except KeyError as e:
+            print(f"Error al analizar la respuesta de Facebook para la URL {publicacion.url}: {e}")
 
 def getPost(ulrPost):
 
