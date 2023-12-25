@@ -22,12 +22,13 @@ def index(request):
         fecha_truncada=TruncDate('fecha_creacion')
     ).order_by('-fecha_truncada', '-engagement__total_engagement')
 
-    # Procesar el formulario de filtro de fechas
+    # Procesar el formulario de filtro de fechas y sitios web
     date_filter_form = DateFilterForm(request.GET)
     if date_filter_form.is_valid():
         start_date = date_filter_form.cleaned_data['start_date']
         end_date = date_filter_form.cleaned_data['end_date']
-        
+        sitios_web_selected = date_filter_form.cleaned_data['sitios_web']
+
         if start_date:
             publicaciones = publicaciones.filter(fecha_creacion__gte=start_date)
         if end_date:
@@ -35,9 +36,12 @@ def index(request):
             end_date_next_day = end_date + timedelta(days=1)
             publicaciones = publicaciones.filter(fecha_creacion__lte=end_date_next_day)
 
-        if start_date and end_date:    
+        if sitios_web_selected:
+            publicaciones = publicaciones.filter(sitio_web__in=sitios_web_selected)
+
+        if start_date and end_date:
             # Después del filtro, ordena por engagement de forma descendente
-            publicaciones = publicaciones.order_by('-engagement__total_engagement')    
+            publicaciones = publicaciones.order_by('-engagement__total_engagement')
 
     # Obtener las variables de fecha del formulario
     start_date = request.GET.get('start_date')
